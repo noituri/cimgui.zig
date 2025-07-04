@@ -11,6 +11,7 @@ const flags_size = utils.flags_size;
 pub const Renderer = enum {
     Vulkan,
     OpenGL3,
+    Wgpu,
 };
 
 pub const Platform = enum {
@@ -19,7 +20,15 @@ pub const Platform = enum {
     SDLGPU3,
 };
 
-pub fn backendOptions(toolbox: *Toolbox, builder: *std.Build, lib: *std.Build.Step.Compile, target: *const std.Build.ResolvedTarget, optimize: *const std.builtin.OptimizeMode, path: *const Paths, flags: *std.BoundedArray([]const u8, flags_size)) !void {
+pub fn backendOptions(
+    toolbox: *Toolbox,
+    builder: *std.Build,
+    lib: *std.Build.Step.Compile,
+    target: *const std.Build.ResolvedTarget,
+    optimize: *const std.builtin.OptimizeMode,
+    path: *const Paths,
+    flags: *std.BoundedArray([]const u8, flags_size),
+) !void {
     const renderer_opt = builder.option(Renderer, "renderer", "Specify the renderer backend");
     const platform_opt = builder.option(Platform, "platform", "Specify the platform backend");
 
@@ -55,6 +64,44 @@ pub fn backendOptions(toolbox: *Toolbox, builder: *std.Build, lib: *std.Build.St
                 });
 
                 lib.root_module.addImport("gl", gl_bindings);
+            },
+            .Wgpu => {
+                try toolbox.addSource(lib, path.getBackends(), "imgui_impl_wgpu.cpp", flags.slice());
+                try toolbox.addSource(lib, path.getBackends(), "dcimgui_impl_wgpu.cpp", flags.slice());
+
+                const wgpu_native_dep = builder.dependency("wgpu_native_zig", .{});
+                const target_res = target.result;
+                const os_str = @tagName(target_res.os.tag);
+                const arch_str = @tagName(target_res.cpu.arch);
+
+                const mode_str = switch (optimize.*) {
+                    .Debug => "debug",
+                    else => "release",
+                };
+                const abi_str = switch (target_res.os.tag) {
+                    .ios => switch (target_res.abi) {
+                        .simulator => "_simulator",
+                        else => "",
+                    },
+                    .windows => switch (target_res.abi) {
+                        .msvc => "_msvc",
+                        else => "_gnu",
+                    },
+                    else => "",
+                };
+                const target_name_slices = [_][:0]const u8{ "wgpu_", os_str, "_", arch_str, abi_str, "_", mode_str };
+                const maybe_target_name = std.mem.concatWithSentinel(builder.allocator, u8, &target_name_slices, 0);
+                const target_name = maybe_target_name catch |err| {
+                    std.debug.panic("Failed to format target name: {s}", .{@errorName(err)});
+                };
+                const wgpu_dep = wgpu_native_dep.builder.lazyDependency(target_name, .{}) orelse unreachable;
+                lib.root_module.addCMacro("IMGUI_IMPL_WEBGPU_BACKEND_WGPU", "1");
+                lib.addIncludePath(wgpu_dep.path("include"));
+                // toolbox.addInclude(lib, wgpu_dep.path("include").getPath(wgpu_dep.builder));
+                toolbox.addHeader(lib, wgpu_dep.path("include").getPath(wgpu_dep.builder), ".", &.{
+                    ".h",
+                });
+                // lib.root_module.addImport("wgpu", wgpu_native_dep.module("wgpu"));
             },
         }
     } else std.log.warn("Unspecified renderer backend", .{});

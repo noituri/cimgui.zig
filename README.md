@@ -1,20 +1,6 @@
 # cimgui.zig
-
-This is a fork of [ocornut/imgui][1] packaged for [Zig][2]
-
-## Why this fork ?
-
-The intention under this fork is to package [ocornut/imgui][1] for [Zig][2]. So:
-* Unnecessary files have been deleted,
-* The build system has been replaced with `build.zig`,
-* [dearimgui/dear_bindings][3] generates the C binding,
-* A cron runs every day to check [ocornut/imgui][2] and [dearimgui/dear_bindings][3]. Then it updates this repository if a new release is available.
-
-## How to use it
-
-The goal of this repository is not to provide a [Zig][2] binding for [ocornut/imgui][1]. There are at least as many legit ways as possible to make a binding as there are active accounts on Github. So you are not going to find an answer for this question here. The point of this repository is to abstract the [ocornut/imgui][1] compilation process with [Zig][2] (which is not new comers friendly and not easy to maintain) to let you focus on your application. So you can use **cimgui.zig**:
-- as raw (see the [examples directory](https://github.com/tiawl/cimgui.zig/blob/trunk/examples)),
-- as a daily updated interface for your [Zig][2] binding of [ocornut/imgui][1] (see [here][10] for a private usage).
+> [!NOTE]
+> This is a fork of [tiawl/cimgui.zig][1] with added [wgpu-native][15] support
 
 ### cimgui.zig as a library
 If you want to add `cimgui.zig` as a library to your project, you can do the following (do know that it requires a zig version `>0.13`) :
@@ -36,7 +22,7 @@ pub fn build(b: *std.Build) void {
 +        .target = target,
 +        .optimize = optimize,
 +        .platform = cimgui.Platform.GLFW,
-+        .renderer = cimgui.Renderer.Vulkan,
++        .renderer = cimgui.Renderer.Wgpu,
 +    });
 
     // Where `exe` represents your executable/library to link to
@@ -59,6 +45,7 @@ The backends are separated in two categories : the platforms (handling windows, 
 ### Renderers
   - [Vulkan][5]
   - [OpenGL][12]
+  - [WGPU][15]
 
 > As you can see, these backends do not support all of those supported by ImGUI. Adding a backend is a bit of work because of the needed *maintenance*. Please do not ask for backends to be added if you don't feel like adding them yourselves !
 
@@ -112,7 +99,7 @@ The parts of this repository originated from this repository are dedicated to th
 
 **For other parts, it is subject to the License restrictions their respective owners choosed. By design, the public domain code is incompatible with the License notion. In this case, the License prevails. So if you have any doubt about a file property, open an issue.**
 
-[1]:https://github.com/ocornut/imgui
+[1]:https://github.com/tiawl/cimgui.zig
 [2]:https://github.com/ziglang/zig
 [3]:https://github.com/dearimgui/dear_bindings
 [4]:https://github.com/glfw/glfw
@@ -126,3 +113,4 @@ The parts of this repository originated from this repository are dedicated to th
 [12]:https://www.opengl.org/
 [13]:https://github.com/castholm/SDL
 [14]:https://github.com/castholm/zigglgen
+[15]:https://github.com/gfx-rs/wgpu-native

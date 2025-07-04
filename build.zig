@@ -133,7 +133,7 @@ fn update(toolbox: *Toolbox, path: *const Paths) !void {
 }
 
 const FromZon = toolbox_pkg.Repositories(.{
-    .toolbox, .vulkan_zig, .glfw_zig, .sdl, .zigglgen,
+    .toolbox, .vulkan_zig, .glfw_zig, .sdl, .zigglgen, .wgpu_native_zig,
 });
 
 const DuringExec = toolbox_pkg.Repositories(.{
@@ -169,6 +169,11 @@ pub fn build(builder: *std.Build) !void {
         },
         .zigglgen = .{
             .name = "castholm/zigglgen",
+            .host = .github,
+            .ref = .commit,
+        },
+        .wgpu_native_zig = .{
+            .name = "bronter/wgpu_native_zig",
             .host = .github,
             .ref = .commit,
         },
