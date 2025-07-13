@@ -23,8 +23,8 @@
             .hash = "vulkan_zig-1.0.0-p2wg3rE3IAFnSnKUQAezkJ6NuiMe5r2F-S8pk8Kbfr8V",
         },
         .wgpu_native_zig = .{
-            .url = "https://github.com/noituri/wgpu_native_zig/archive/refs/tags/shader_int64.tar.gz",
-            .hash = "wgpu_native_zig-6.4.0-B9jeDLJzAwBIMRwbyUpvT3EbHjVIqqF-4Pgxlb_t41JX",
+            .url = "git+https://github.com/noituri/wgpu_native_zig#30c11ca2832f263ca43345220b4dd33eb8d0b840",
+            .hash = "wgpu_native_zig-6.4.0-B9jeDLJzAwADVythbxjitgmqXukTwHY5Z1Ri9O1u-9Cu",
         },
     },
     .minimum_zig_version = "0.14.1",
