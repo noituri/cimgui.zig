@@ -94,7 +94,7 @@ pub fn backendOptions(
                 const target_name = maybe_target_name catch |err| {
                     std.debug.panic("Failed to format target name: {s}", .{@errorName(err)});
                 };
-                const wgpu_dep = wgpu_native_dep.builder.lazyDependency(target_name, .{}) orelse unreachable;
+                const wgpu_dep = wgpu_native_dep.builder.lazyDependency(target_name, .{}) orelse return;
                 lib.root_module.addCMacro("IMGUI_IMPL_WEBGPU_BACKEND_WGPU", "1");
                 lib.addIncludePath(wgpu_dep.path("include"));
                 // toolbox.addInclude(lib, wgpu_dep.path("include").getPath(wgpu_dep.builder));
